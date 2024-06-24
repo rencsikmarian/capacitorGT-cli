@@ -1,0 +1,10 @@
+import type { Colors } from '@ionic/cli-framework-output';
+import kleur from 'kleur';
+export declare const strong: kleur.Color;
+export declare const weak: kleur.Color;
+export declare const input: kleur.Color;
+export declare const success: kleur.Color;
+export declare const failure: kleur.Color;
+export declare const ancillary: kleur.Color;
+declare const COLORS: Colors;
+export default COLORS;
