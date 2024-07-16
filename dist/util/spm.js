@@ -31,13 +31,16 @@ async function generatePackageFile(config, plugins) {
 exports.generatePackageFile = generatePackageFile;
 function generatePackageText(config, plugins) {
     var _a, _b, _c;
+    const pbx = (0, utils_fs_1.readFileSync)((0, path_1.join)(config.ios.nativeXcodeProjDirAbs, 'project.pbxproj'), 'utf-8');
+    const searchString = 'IPHONEOS_DEPLOYMENT_TARGET = ';
+    const iosVersion = pbx.substring(pbx.indexOf(searchString) + searchString.length, pbx.indexOf(searchString) + searchString.length + 2);
     let packageSwiftText = `// swift-tools-version: 5.9
 import PackageDescription
 
 // DO NOT MODIFY THIS FILE - managed by Capacitor CLI commands
 let package = Package(
     name: "CapApp-SPM",
-    platforms: [.iOS(.v13)],
+    platforms: [.iOS(.v${iosVersion})],
     products: [
         .library(
             name: "CapApp-SPM",
