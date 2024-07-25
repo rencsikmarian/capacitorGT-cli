@@ -19,4 +19,4 @@ export declare function checkPluginDependencies(plugins: Plugin[], platform: str
 export declare function getIncompatibleCordovaPlugins(platform: string): string[];
 export declare function needsStaticPod(plugin: Plugin, config: Config): boolean;
 export declare function getCordovaPreferences(config: Config): Promise<any>;
-export declare function writeCordovaAndroidManifest(cordovaPlugins: Plugin[], config: Config, platform: string): Promise<void>;
+export declare function writeCordovaAndroidManifest(cordovaPlugins: Plugin[], config: Config, platform: string, cleartext?: boolean): Promise<void>;
