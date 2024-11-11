@@ -15,7 +15,7 @@ async function doctorCommand(config, selectedPlatformName) {
     log_1.output.write(`${(0, emoji_1.emoji)('💊', '')}   ${colors_1.default.strong('Capacitor Doctor')}  ${(0, emoji_1.emoji)('💊', '')} \n\n`);
     await doctorCore(config);
     const platforms = await (0, common_1.selectPlatforms)(config, selectedPlatformName);
-    await Promise.all(platforms.map(platformName => {
+    await Promise.all(platforms.map((platformName) => {
         return doctor(config, platformName);
     }));
 }
@@ -38,12 +38,7 @@ async function doctorCore(config) {
 }
 exports.doctorCore = doctorCore;
 async function printInstalledPackages(config) {
-    const packageNames = [
-        '@capacitor/cli',
-        '@capacitor/core',
-        '@capacitor/android',
-        '@capacitor/ios',
-    ];
+    const packageNames = ['@capacitor/cli', '@capacitor/core', '@capacitor/android', '@capacitor/ios'];
     await Promise.all(packageNames.map(async (packageName) => {
         const packagePath = (0, node_1.resolveNode)(config.app.rootDir, packageName, 'package.json');
         await printPackageVersion(packageName, packagePath);

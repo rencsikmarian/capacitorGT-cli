@@ -12,11 +12,7 @@ const xml_1 = require("../util/xml");
 async function doctorAndroid(config) {
     var _a;
     try {
-        await (0, common_1.check)([
-            checkAndroidInstalled,
-            () => checkGradlew(config),
-            () => checkAppSrcDirs(config),
-        ]);
+        await (0, common_1.check)([checkAndroidInstalled, () => checkGradlew(config), () => checkAppSrcDirs(config)]);
         (0, log_1.logSuccess)('Android looking great! 👌');
     }
     catch (e) {
@@ -70,22 +66,22 @@ async function checkAndroidManifestData(config, xmlData) {
         return `Missing ${colors_1.default.input('<application>')} XML node as a child node of ${colors_1.default.input('<manifest>')} in ${colors_1.default.strong(config.android.srcMainDir)}`;
     }
     let mainActivityClassPath = '';
-    const mainApplicationNode = applicationChildNodes.find(applicationChildNode => {
+    const mainApplicationNode = applicationChildNodes.find((applicationChildNode) => {
         const activityChildNodes = applicationChildNode.activity;
         if (!Array.isArray(activityChildNodes)) {
             return false;
         }
-        const mainActivityNode = activityChildNodes.find(activityChildNode => {
+        const mainActivityNode = activityChildNodes.find((activityChildNode) => {
             const intentFilterChildNodes = activityChildNode['intent-filter'];
             if (!Array.isArray(intentFilterChildNodes)) {
                 return false;
             }
-            return intentFilterChildNodes.find(intentFilterChildNode => {
+            return intentFilterChildNodes.find((intentFilterChildNode) => {
                 const actionChildNodes = intentFilterChildNode.action;
                 if (!Array.isArray(actionChildNodes)) {
                     return false;
                 }
-                const mainActionChildNode = actionChildNodes.find(actionChildNode => {
+                const mainActionChildNode = actionChildNodes.find((actionChildNode) => {
                     const androidName = actionChildNode.$['android:name'];
                     return androidName === 'android.intent.action.MAIN';
                 });
@@ -96,7 +92,7 @@ async function checkAndroidManifestData(config, xmlData) {
                 if (!Array.isArray(categoryChildNodes)) {
                     return false;
                 }
-                return categoryChildNodes.find(categoryChildNode => {
+                return categoryChildNodes.find((categoryChildNode) => {
                     const androidName = categoryChildNode.$['android:name'];
                     return androidName === 'android.intent.category.LAUNCHER';
                 });
@@ -122,7 +118,7 @@ async function checkPackage(config, mainActivityClassPath) {
     }
     const mainActivityClassName = mainActivityClassPath.split('.').pop();
     const srcFiles = await (0, utils_fs_1.readdirp)(appSrcMainJavaDir, {
-        filter: entry => !entry.stats.isDirectory() &&
+        filter: (entry) => !entry.stats.isDirectory() &&
             ['.java', '.kt'].includes((0, path_1.extname)(entry.path)) &&
             mainActivityClassName === (0, path_1.parse)(entry.path).name,
     });

@@ -13,8 +13,8 @@ const monorepotools_1 = require("./util/monorepotools");
 const node_1 = require("./util/node");
 const subprocess_1 = require("./util/subprocess");
 async function check(checks) {
-    const results = await Promise.all(checks.map(f => f()));
-    const errors = results.filter(r => r != null);
+    const results = await Promise.all(checks.map((f) => f()));
+    const errors = results.filter((r) => r != null);
     if (errors.length > 0) {
         throw errors.join('\n');
     }
@@ -93,12 +93,20 @@ async function checkAppDir(config, dir) {
 exports.checkAppDir = checkAppDir;
 async function checkAppId(config, id) {
     if (!id) {
-        return `Invalid App ID. Must be in Java package form with no dashes (ex: com.example.app)`;
+        return `Invalid App ID. App ID is required and cannot be blank.`;
     }
-    if (/^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$/.test(id.toLowerCase())) {
+    if (/^[a-zA-Z][\w]*(?:\.[a-zA-Z][\w]*)+$/.test(id.toLowerCase())) {
         return null;
     }
-    return `Invalid App ID "${id}". Must be in Java package form with no dashes (ex: com.example.app)`;
+    return `
+    Invalid App ID "${id}". Your App ID must meet the following requirements to be valid on both iOS and Android:
+    - Must be in Java package form with no dashes (ex: com.example.app)
+    - It must have at least two segments (one or more dots).
+    - Each segment must start with a letter.
+    - All characters must be alphanumeric or an underscore [a-zA-Z][a-zA-Z0-9]+.
+
+    If you would like to skip validation, run "cap init" with the "--skip-appid-validation" flag.
+  `;
 }
 exports.checkAppId = checkAppId;
 async function checkAppName(config, name) {
@@ -110,7 +118,7 @@ async function checkAppName(config, name) {
 }
 exports.checkAppName = checkAppName;
 async function wait(time) {
-    return new Promise(resolve => setTimeout(resolve, time));
+    return new Promise((resolve) => setTimeout(resolve, time));
 }
 exports.wait = wait;
 async function runHooks(config, platformName, dir, hook) {
@@ -152,7 +160,7 @@ async function runPlatformHook(config, platformName, platformDir, hook) {
         p.on('close', () => {
             resolve();
         });
-        p.on('error', err => {
+        p.on('error', (err) => {
             reject(err);
         });
     });
@@ -229,8 +237,7 @@ async function selectPlatforms(config, selectedPlatformName) {
         }
         else if (!(await getProjectPlatformDirectory(config, platformName))) {
             if (platformName === 'web') {
-                (0, errors_1.fatal)(`Could not find the web platform directory.\n` +
-                    `Make sure ${colors_1.default.strong(config.app.webDir)} exists.`);
+                (0, errors_1.fatal)(`Could not find the web platform directory.\n` + `Make sure ${colors_1.default.strong(config.app.webDir)} exists.`);
             }
             (0, errors_1.fatal)(`${colors_1.default.strong(platformName)} platform has not been added yet.\n` +
                 `See the docs for adding the ${colors_1.default.strong(platformName)} platform: ${colors_1.default.strong(`https://capacitorjs.com/docs/${platformName}#adding-the-${platformName}-platform`)}`);
@@ -275,7 +282,7 @@ async function promptForPlatform(platforms, promptMessage, selectedPlatformName)
                 type: 'select',
                 name: 'mode',
                 message: promptMessage,
-                choices: platforms.map(p => ({ title: p, value: p })),
+                choices: platforms.map((p) => ({ title: p, value: p })),
             },
         ], { onCancel: () => process.exit(1) });
         return answers.mode.toLowerCase().trim();
@@ -283,15 +290,14 @@ async function promptForPlatform(platforms, promptMessage, selectedPlatformName)
     const platformName = selectedPlatformName.toLowerCase().trim();
     if (!(await isValidPlatform(platformName))) {
         const knownPlatforms = await getKnownPlatforms();
-        (0, errors_1.fatal)(`Invalid platform: ${colors_1.default.input(platformName)}.\n` +
-            `Valid platforms include: ${knownPlatforms.join(', ')}`);
+        (0, errors_1.fatal)(`Invalid platform: ${colors_1.default.input(platformName)}.\n` + `Valid platforms include: ${knownPlatforms.join(', ')}`);
     }
     return platformName;
 }
 exports.promptForPlatform = promptForPlatform;
 async function promptForPlatformTarget(targets, selectedTarget) {
     const { prompt } = await Promise.resolve().then(() => tslib_1.__importStar(require('prompts')));
-    const validTargets = targets.filter(t => t.id !== undefined);
+    const validTargets = targets.filter((t) => t.id !== undefined);
     if (!selectedTarget) {
         if (validTargets.length === 1) {
             return validTargets[0];
@@ -302,7 +308,7 @@ async function promptForPlatformTarget(targets, selectedTarget) {
                     type: 'select',
                     name: 'target',
                     message: 'Please choose a target device:',
-                    choices: validTargets.map(t => ({
+                    choices: validTargets.map((t) => ({
                         title: `${getPlatformTargetName(t)} (${t.id})`,
                         value: t,
                     })),
@@ -312,19 +318,16 @@ async function promptForPlatformTarget(targets, selectedTarget) {
         }
     }
     const targetID = selectedTarget.trim();
-    const target = targets.find(t => t.id === targetID);
+    const target = targets.find((t) => t.id === targetID);
     if (!target) {
-        (0, errors_1.fatal)(`Invalid target ID: ${colors_1.default.input(targetID)}.\n` +
-            `Valid targets are: ${targets.map(t => t.id).join(', ')}`);
+        (0, errors_1.fatal)(`Invalid target ID: ${colors_1.default.input(targetID)}.\n` + `Valid targets are: ${targets.map((t) => t.id).join(', ')}`);
     }
     return target;
 }
 exports.promptForPlatformTarget = promptForPlatformTarget;
 function getPlatformTargetName(target) {
     var _a, _b, _c;
-    return `${(_c = (_b = (_a = target.name) !== null && _a !== void 0 ? _a : target.model) !== null && _b !== void 0 ? _b : target.id) !== null && _c !== void 0 ? _c : '?'}${target.virtual
-        ? ` (${target.platform === 'ios' ? 'simulator' : 'emulator'})`
-        : ''}`;
+    return `${(_c = (_b = (_a = target.name) !== null && _a !== void 0 ? _a : target.model) !== null && _b !== void 0 ? _b : target.id) !== null && _c !== void 0 ? _c : '?'}${target.virtual ? ` (${target.platform === 'ios' ? 'simulator' : 'emulator'})` : ''}`;
 }
 exports.getPlatformTargetName = getPlatformTargetName;
 async function getAddedPlatforms(config) {
@@ -343,8 +346,7 @@ async function checkPlatformVersions(config, platform) {
     const semver = await Promise.resolve().then(() => tslib_1.__importStar(require('semver')));
     const coreVersion = await getCoreVersion(config);
     const platformVersion = await getCapacitorPackageVersion(config, platform);
-    if (semver.diff(coreVersion, platformVersion) === 'minor' ||
-        semver.diff(coreVersion, platformVersion) === 'major') {
+    if (semver.diff(coreVersion, platformVersion) === 'minor' || semver.diff(coreVersion, platformVersion) === 'major') {
         log_1.logger.warn(`${colors_1.default.strong('@capacitor/core')}${colors_1.default.weak(`@${coreVersion}`)} version doesn't match ${colors_1.default.strong(`@capacitor/${platform}`)}${colors_1.default.weak(`@${platformVersion}`)} version.\n` +
             `Consider updating to a matching version, e.g. w/ ${colors_1.default.input(`npm install @capacitor/core@${platformVersion}`)}`);
     }
@@ -386,9 +388,7 @@ async function checkJDKMajorVersion() {
         if (typeof firstVersionNumber === 'number' && firstVersionNumber != 1) {
             return firstVersionNumber;
         }
-        else if (typeof secondVersionNumber === 'number' &&
-            firstVersionNumber == 1 &&
-            secondVersionNumber < 9) {
+        else if (typeof secondVersionNumber === 'number' && firstVersionNumber == 1 && secondVersionNumber < 9) {
             return secondVersionNumber;
         }
         else {

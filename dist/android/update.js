@@ -20,11 +20,11 @@ const platform = 'android';
 const debug = (0, debug_1.default)('capacitor:android:update');
 async function updateAndroid(config) {
     const plugins = await getPluginsTask(config);
-    const capacitorPlugins = plugins.filter(p => (0, plugin_1.getPluginType)(p, platform) === 0 /* PluginType.Core */);
+    const capacitorPlugins = plugins.filter((p) => (0, plugin_1.getPluginType)(p, platform) === 0 /* PluginType.Core */);
     (0, plugin_1.printPlugins)(capacitorPlugins, 'android');
     await writePluginsJson(config, capacitorPlugins);
     await removePluginsNativeFiles(config);
-    const cordovaPlugins = plugins.filter(p => (0, plugin_1.getPluginType)(p, platform) === 1 /* PluginType.Cordova */);
+    const cordovaPlugins = plugins.filter((p) => (0, plugin_1.getPluginType)(p, platform) === 1 /* PluginType.Cordova */);
     await (0, migrate_1.patchOldCapacitorPlugins)(config);
     if (cordovaPlugins.length > 0) {
         await copyPluginsNativeFiles(config, cordovaPlugins);
@@ -37,7 +37,7 @@ async function updateAndroid(config) {
     await installGradlePlugins(config, capacitorPlugins, cordovaPlugins);
     await handleCordovaPluginsGradle(config, cordovaPlugins);
     await (0, cordova_1.writeCordovaAndroidManifest)(cordovaPlugins, config, platform);
-    const incompatibleCordovaPlugins = plugins.filter(p => (0, plugin_1.getPluginType)(p, platform) === 2 /* PluginType.Incompatible */);
+    const incompatibleCordovaPlugins = plugins.filter((p) => (0, plugin_1.getPluginType)(p, platform) === 2 /* PluginType.Incompatible */);
     (0, plugin_1.printPlugins)(incompatibleCordovaPlugins, platform, 'incompatible');
     await (0, common_1.checkPlatformVersions)(config, platform);
 }
@@ -63,8 +63,7 @@ async function findAndroidPluginClassesInPlugin(plugin) {
     }
     const srcPath = (0, path_1.resolve)(plugin.rootPath, plugin.android.path, 'src/main');
     const srcFiles = await (0, utils_fs_1.readdirp)(srcPath, {
-        filter: entry => !entry.stats.isDirectory() &&
-            ['.java', '.kt'].includes((0, path_1.extname)(entry.path)),
+        filter: (entry) => !entry.stats.isDirectory() && ['.java', '.kt'].includes((0, path_1.extname)(entry.path)),
     });
     const classRegex = /^@(?:CapacitorPlugin|NativePlugin)[\s\S]+?class ([\w]+)/gm;
     const packageRegex = /^package ([\w.]+);?$/gm;
@@ -79,8 +78,7 @@ async function findAndroidPluginClassesInPlugin(plugin) {
             packageRegex.lastIndex = 0;
             const packageMatch = packageRegex.exec(srcFileContents.substring(0, classMatch.index));
             if (!packageMatch) {
-                (0, errors_1.fatal)(`Package could not be parsed from Android plugin.\n` +
-                    `Location: ${colors_1.default.strong(srcFile)}`);
+                (0, errors_1.fatal)(`Package could not be parsed from Android plugin.\n` + `Location: ${colors_1.default.strong(srcFile)}`);
             }
             const packageName = packageMatch[1];
             const classpath = `${packageName}.${className}`;
@@ -107,7 +105,7 @@ async function installGradlePlugins(config, capacitorPlugins, cordovaPlugins) {
 include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('${relativeCapcitorAndroidPath}')
 ${capacitorPlugins
-        .map(p => {
+        .map((p) => {
         if (!p.android) {
             return '';
         }
@@ -121,7 +119,7 @@ project(':${getGradlePackageName(p.id)}').projectDir = new File('${relativePlugi
     const applyArray = [];
     const frameworksArray = [];
     let prefsArray = [];
-    cordovaPlugins.map(p => {
+    cordovaPlugins.map((p) => {
         const relativePluginPath = (0, fs_1.convertToUnixPath)((0, path_1.relative)(dependencyPath, p.rootPath));
         const frameworks = (0, plugin_1.getPlatformElement)(p, platform, 'framework');
         frameworks.map((framework) => {
@@ -156,7 +154,7 @@ android {
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
 ${capacitorPlugins
-        .map(p => {
+        .map((p) => {
         return `    implementation project(':${getGradlePackageName(p.id)}')`;
     })
         .join('\n')}
@@ -181,7 +179,7 @@ async function handleCordovaPluginsGradle(config, cordovaPlugins) {
     let prefsArray = [];
     const applyArray = [];
     applyArray.push(`apply from: "cordova.variables.gradle"`);
-    cordovaPlugins.map(p => {
+    cordovaPlugins.map((p) => {
         const relativePluginPath = (0, fs_1.convertToUnixPath)((0, path_1.relative)(config.android.cordovaPluginsDirAbs, p.rootPath));
         const frameworks = (0, plugin_1.getPlatformElement)(p, platform, 'framework');
         frameworks.map((framework) => {
@@ -198,7 +196,7 @@ async function handleCordovaPluginsGradle(config, cordovaPlugins) {
         prefsArray = prefsArray.concat((0, plugin_1.getAllElements)(p, platform, 'preference'));
     });
     let frameworkString = frameworksArray
-        .map(f => {
+        .map((f) => {
         if (f.startsWith('platform(')) {
             return `    implementation ${f}`;
         }
@@ -236,8 +234,7 @@ ext {
 exports.handleCordovaPluginsGradle = handleCordovaPluginsGradle;
 async function kotlinNeededCheck(config, cordovaPlugins) {
     var _a, _b;
-    if (((_b = (_a = config.app.extConfig.cordova) === null || _a === void 0 ? void 0 : _a.preferences) === null || _b === void 0 ? void 0 : _b.GradlePluginKotlinEnabled) !==
-        'true') {
+    if (((_b = (_a = config.app.extConfig.cordova) === null || _a === void 0 ? void 0 : _a.preferences) === null || _b === void 0 ? void 0 : _b.GradlePluginKotlinEnabled) !== 'true') {
         for (const plugin of cordovaPlugins) {
             const androidPlatform = (0, plugin_1.getPluginPlatform)(plugin, platform);
             const sourceFiles = androidPlatform['source-file'];
@@ -268,9 +265,7 @@ async function copyPluginsNativeFiles(config, cordovaPlugins) {
                     if (fileName.split('.').pop() === 'aidl') {
                         baseFolder = 'aidl/';
                     }
-                    const target = sourceFile.$['target-dir']
-                        .replace('app/src/main/', '')
-                        .replace('src/', baseFolder);
+                    const target = sourceFile.$['target-dir'].replace('app/src/main/', '').replace('src/', baseFolder);
                     await (0, utils_fs_1.copy)((0, plugin_1.getFilePath)(config, p, sourceFile.$.src), (0, path_1.join)(pluginsPath, target, fileName));
                 }
             }

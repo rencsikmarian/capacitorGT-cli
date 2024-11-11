@@ -9,7 +9,7 @@ const convertToUnixPath = (path) => {
 exports.convertToUnixPath = convertToUnixPath;
 const deleteFolderRecursive = (directoryPath) => {
     if ((0, utils_fs_1.existsSync)(directoryPath)) {
-        (0, utils_fs_1.readdirSync)(directoryPath).forEach(file => {
+        (0, utils_fs_1.readdirSync)(directoryPath).forEach((file) => {
             const curPath = (0, path_1.join)(directoryPath, file);
             if ((0, utils_fs_1.lstatSync)(curPath).isDirectory()) {
                 (0, exports.deleteFolderRecursive)(curPath);

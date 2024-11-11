@@ -43,10 +43,10 @@ async function receive(msg) {
             headers: {
                 'Content-Type': 'application/json',
             },
-        }, response => {
+        }, (response) => {
             debug('Sent %O metric to events service (status: %O)', data.name, response.statusCode);
             if (response.statusCode !== 204) {
-                response.on('data', chunk => {
+                response.on('data', (chunk) => {
                     debug('Bad response from events service. Request body: %O', chunk.toString());
                 });
             }

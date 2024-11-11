@@ -21,7 +21,7 @@ const xml_1 = require("./util/xml");
 function generateCordovaPluginsJSFile(config, plugins, platform) {
     const pluginModules = [];
     const pluginExports = [];
-    plugins.map(p => {
+    plugins.map((p) => {
         const pluginId = p.xml.$.id;
         const jsModules = (0, plugin_1.getJSModules)(p, platform);
         jsModules.map((jsModule) => {
@@ -60,9 +60,7 @@ function generateCordovaPluginsJSFile(config, plugins, platform) {
                 merge: mergeKey,
                 // mimics Cordova's module name logic if the name attr is missing
                 pluginContent: `{
-          "id": "${pluginId +
-                    '.' +
-                    (jsModule.$.name || jsModule.$.src.match(/([^/]+)\.js/)[1])}",
+          "id": "${pluginId + '.' + (jsModule.$.name || jsModule.$.src.match(/([^/]+)\.js/)[1])}",
           "file": "plugins/${pluginId}/${jsModule.$.src}",
           "pluginId": "${pluginId}"${clobbersModule}${mergesModule}${runsModule}
         }`,
@@ -80,7 +78,7 @@ function generateCordovaPluginsJSFile(config, plugins, platform) {
         : a.clobber || b.clobber // Clobbers before anything else
             ? b.clobber.localeCompare(a.clobber)
             : a.merge.localeCompare(b.merge))
-        .map(e => e.pluginContent)
+        .map((e) => e.pluginContent)
         .join(',\n      ')}
     ];
     module.exports.metadata =
@@ -112,10 +110,7 @@ async function copyPluginsJS(config, cordovaPlugins, platform) {
             let data = await (0, utils_fs_1.readFile)(filePath, { encoding: 'utf-8' });
             data = data.trim();
             // mimics Cordova's module name logic if the name attr is missing
-            const name = pluginId +
-                '.' +
-                (jsModule.$.name ||
-                    (0, path_1.basename)(jsModule.$.src, (0, path_1.extname)(jsModule.$.src)));
+            const name = pluginId + '.' + (jsModule.$.name || (0, path_1.basename)(jsModule.$.src, (0, path_1.extname)(jsModule.$.src)));
             data = `cordova.define("${name}", function(require, exports, module) { \n${data}\n});`;
             data = data.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi, '');
             await (0, utils_fs_1.writeFile)(filePath, data, { encoding: 'utf-8' });
@@ -132,7 +127,8 @@ exports.copyPluginsJS = copyPluginsJS;
 async function copyCordovaJS(config, platform) {
     const cordovaPath = (0, node_1.resolveNode)(config.app.rootDir, '@capacitor/core', 'cordova.js');
     if (!cordovaPath) {
-        (0, errors_1.fatal)(`Unable to find ${colors_1.default.strong('node_modules/@capacitor/core/cordova.js')}.\n` + `Are you sure ${colors_1.default.strong('@capacitor/core')} is installed?`);
+        (0, errors_1.fatal)(`Unable to find ${colors_1.default.strong('node_modules/@capacitor/core/cordova.js')}.\n` +
+            `Are you sure ${colors_1.default.strong('@capacitor/core')} is installed?`);
     }
     return (0, utils_fs_1.copy)(cordovaPath, (0, path_1.join)(await getWebDir(config, platform), 'cordova.js'));
 }
@@ -162,7 +158,7 @@ async function autoGenerateConfig(config, cordovaPlugins, platform) {
     const cordovaConfigXMLFile = (0, path_1.join)(xmlDir, fileName);
     await (0, utils_fs_1.remove)(cordovaConfigXMLFile);
     const pluginEntries = [];
-    cordovaPlugins.map(p => {
+    cordovaPlugins.map((p) => {
         const currentPlatform = (0, plugin_1.getPluginPlatform)(p, platform);
         if (currentPlatform) {
             const configFiles = currentPlatform['config-file'];
@@ -243,11 +239,11 @@ async function getCordovaPlugins(config, platform) {
     else if (platform === config.android.name) {
         plugins = await (0, common_1.getAndroidPlugins)(allPlugins);
     }
-    return plugins.filter(p => (0, plugin_1.getPluginType)(p, platform) === 1 /* PluginType.Cordova */);
+    return plugins.filter((p) => (0, plugin_1.getPluginType)(p, platform) === 1 /* PluginType.Cordova */);
 }
 exports.getCordovaPlugins = getCordovaPlugins;
 async function logCordovaManualSteps(cordovaPlugins, config, platform) {
-    cordovaPlugins.map(p => {
+    cordovaPlugins.map((p) => {
         const editConfig = (0, plugin_1.getPlatformElement)(p, platform, 'edit-config');
         const configFile = (0, plugin_1.getPlatformElement)(p, platform, 'config-file');
         editConfig.concat(configFile).map(async (configElement) => {
@@ -280,14 +276,10 @@ async function logiOSPlist(configElement, config, plugin) {
         if (!dict.key.includes(configElement.$.parent)) {
             let xml = buildConfigFileXml(configElement);
             xml = `<key>${configElement.$.parent}</key>${getConfigFileTagContent(xml)}`;
-            log_1.logger.warn(`Configuration required for ${colors_1.default.strong(plugin.id)}.\n` +
-                `Add the following to Info.plist:\n` +
-                xml);
+            log_1.logger.warn(`Configuration required for ${colors_1.default.strong(plugin.id)}.\n` + `Add the following to Info.plist:\n` + xml);
         }
         else if (configElement.array || configElement.dict) {
-            if (configElement.array &&
-                configElement.array.length > 0 &&
-                configElement.array[0].string) {
+            if (configElement.array && configElement.array.length > 0 && configElement.array[0].string) {
                 let xml = '';
                 configElement.array[0].string.map((element) => {
                     const d = plistData[configElement.$.parent];
@@ -356,8 +348,7 @@ async function logiOSPlist(configElement, config, plugin) {
                 parsedRequiredElements.push(rootOfRequiredElementsToAdd);
                 const doesContainElements = (requiredElementsArray, existingElementsArray) => {
                     for (const requiredElement of requiredElementsArray) {
-                        if (requiredElement.name === 'key' ||
-                            requiredElement.name === 'string') {
+                        if (requiredElement.name === 'key' || requiredElement.name === 'string') {
                             let foundMatch = false;
                             for (const existingElement of existingElementsArray) {
                                 if (existingElement.name === requiredElement.name &&
@@ -375,8 +366,7 @@ async function logiOSPlist(configElement, config, plugin) {
                             let foundMatch = false;
                             for (const existingElement of existingElementsArray) {
                                 if (existingElement.name === requiredElement.name) {
-                                    if ((requiredElement.children !== undefined) ===
-                                        (existingElement.children !== undefined)) {
+                                    if ((requiredElement.children !== undefined) === (existingElement.children !== undefined)) {
                                         if (doesContainElements(requiredElement.children, existingElement.children)) {
                                             foundMatch = true;
                                             break;
@@ -422,8 +412,8 @@ function removeOuterTags(str) {
 }
 async function checkPluginDependencies(plugins, platform) {
     const pluginDeps = new Map();
-    const cordovaPlugins = plugins.filter(p => (0, plugin_1.getPluginType)(p, platform) === 1 /* PluginType.Cordova */);
-    const incompatible = plugins.filter(p => (0, plugin_1.getPluginType)(p, platform) === 2 /* PluginType.Incompatible */);
+    const cordovaPlugins = plugins.filter((p) => (0, plugin_1.getPluginType)(p, platform) === 1 /* PluginType.Cordova */);
+    const incompatible = plugins.filter((p) => (0, plugin_1.getPluginType)(p, platform) === 2 /* PluginType.Incompatible */);
     await Promise.all(cordovaPlugins.map(async (p) => {
         let allDependencies = [];
         allDependencies = allDependencies.concat((0, plugin_1.getPlatformElement)(p, platform, 'dependency'));
@@ -431,8 +421,7 @@ async function checkPluginDependencies(plugins, platform) {
             allDependencies = allDependencies.concat(p.xml['dependency']);
         }
         allDependencies = allDependencies.filter((dep) => !getIncompatibleCordovaPlugins(platform).includes(dep.$.id) &&
-            incompatible.filter(p => p.id === dep.$.id || p.xml.$.id === dep.$.id)
-                .length === 0);
+            incompatible.filter((p) => p.id === dep.$.id || p.xml.$.id === dep.$.id).length === 0);
         if (allDependencies) {
             await Promise.all(allDependencies.map(async (dep) => {
                 var _a;
@@ -441,7 +430,7 @@ async function checkPluginDependencies(plugins, platform) {
                 if (plugin.includes('@') && plugin.indexOf('@') !== 0) {
                     [plugin, version] = plugin.split('@');
                 }
-                if (cordovaPlugins.filter(p => p.id === plugin || p.xml.$.id === plugin).length === 0) {
+                if (cordovaPlugins.filter((p) => p.id === plugin || p.xml.$.id === plugin).length === 0) {
                     if ((_a = dep.$.url) === null || _a === void 0 ? void 0 : _a.startsWith('http')) {
                         plugin = dep.$.url;
                         version = dep.$.commit;
@@ -457,9 +446,7 @@ async function checkPluginDependencies(plugins, platform) {
         let msg = `${colors_1.default.failure(colors_1.default.strong('Plugins are missing dependencies.'))}\n` +
             `Cordova plugin dependencies must be installed in your project (e.g. w/ ${colors_1.default.input('npm install')}).\n`;
         for (const [plugin, deps] of pluginDeps.entries()) {
-            msg +=
-                `\n  ${colors_1.default.strong(plugin)} is missing dependencies:\n` +
-                    deps.map(d => `    - ${d}`).join('\n');
+            msg += `\n  ${colors_1.default.strong(plugin)} is missing dependencies:\n` + deps.map((d) => `    - ${d}`).join('\n');
         }
         log_1.logger.warn(`${msg}\n`);
     }
@@ -490,18 +477,8 @@ function getIncompatibleCordovaPlugins(platform) {
     return pluginList;
 }
 exports.getIncompatibleCordovaPlugins = getIncompatibleCordovaPlugins;
-function needsStaticPod(plugin, config) {
-    var _a, _b, _c, _d;
-    let pluginList = [
-        'phonegap-plugin-push',
-        '@batch.com/cordova-plugin',
-        'onesignal-cordova-plugin',
-    ];
-    if ((_b = (_a = config.app.extConfig) === null || _a === void 0 ? void 0 : _a.cordova) === null || _b === void 0 ? void 0 : _b.staticPlugins) {
-        log_1.logger.warn('cordova.staticPlugins is deprecated, make sure you are using latest version of the plugin');
-        pluginList = pluginList.concat((_d = (_c = config.app.extConfig) === null || _c === void 0 ? void 0 : _c.cordova) === null || _d === void 0 ? void 0 : _d.staticPlugins);
-    }
-    return pluginList.includes(plugin.id) || useFrameworks(plugin);
+function needsStaticPod(plugin) {
+    return useFrameworks(plugin);
 }
 exports.needsStaticPod = needsStaticPod;
 function useFrameworks(plugin) {
@@ -573,16 +550,14 @@ async function writeCordovaAndroidManifest(cordovaPlugins, config, platform, cle
             if (configElement.$ &&
                 (((_a = configElement.$.target) === null || _a === void 0 ? void 0 : _a.includes('AndroidManifest.xml')) ||
                     ((_b = configElement.$.file) === null || _b === void 0 ? void 0 : _b.includes('AndroidManifest.xml')))) {
-                const keys = Object.keys(configElement).filter(k => k !== '$');
-                keys.map(k => {
+                const keys = Object.keys(configElement).filter((k) => k !== '$');
+                keys.map((k) => {
                     configElement[k].map(async (e) => {
                         const xmlElement = (0, xml_1.buildXmlElement)(e, k);
                         const pathParts = getPathParts(configElement.$.parent || configElement.$.target);
                         if (pathParts.length > 1) {
                             if (pathParts.pop() === 'application') {
-                                if (configElement.$.mode &&
-                                    configElement.$.mode === 'merge' &&
-                                    xmlElement.startsWith('<application')) {
+                                if (configElement.$.mode && configElement.$.mode === 'merge' && xmlElement.startsWith('<application')) {
                                     Object.keys(e.$).map((ek) => {
                                         applicationXMLAttributes.push(`${ek}="${e.$[ek]}"`);
                                     });
@@ -657,8 +632,7 @@ async function writeCordovaAndroidManifest(cordovaPlugins, config, platform, cle
                                         if (requiredElement.name !== existingElement.name) {
                                             return false;
                                         }
-                                        if ((requiredElement.attrs !== undefined) !==
-                                            (existingElement.attrs !== undefined)) {
+                                        if ((requiredElement.attrs !== undefined) !== (existingElement.attrs !== undefined)) {
                                             return false;
                                         }
                                         else {
@@ -666,16 +640,14 @@ async function writeCordovaAndroidManifest(cordovaPlugins, config, platform, cle
                                                 const requiredELementAttrKeys = Object.keys(requiredElement.attrs);
                                                 for (const key of requiredELementAttrKeys) {
                                                     if (!/^[$].{1,}$/.test(requiredElement.attrs[key].trim())) {
-                                                        if (requiredElement.attrs[key] !==
-                                                            existingElement.attrs[key]) {
+                                                        if (requiredElement.attrs[key] !== existingElement.attrs[key]) {
                                                             return false;
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                        if ((requiredElement.children !== undefined) !==
-                                            (existingElement.children !== undefined) &&
+                                        if ((requiredElement.children !== undefined) !== (existingElement.children !== undefined) &&
                                             ((_a = requiredElement.children) === null || _a === void 0 ? void 0 : _a.length) !== 0) {
                                             return false;
                                         }
@@ -697,8 +669,7 @@ async function writeCordovaAndroidManifest(cordovaPlugins, config, platform, cle
                                                 }
                                             }
                                             else {
-                                                if (requiredElement.children === undefined &&
-                                                    existingElement.children === undefined) {
+                                                if (requiredElement.children === undefined && existingElement.children === undefined) {
                                                     return true;
                                                 }
                                                 else {
@@ -736,8 +707,7 @@ async function writeCordovaAndroidManifest(cordovaPlugins, config, platform, cle
                                             ...requiredElements[rootKeyOfRequiredElements]['$'],
                                         };
                                     }
-                                    if (requiredElements[rootKeyOfRequiredElements]['$$'] !==
-                                        undefined) {
+                                    if (requiredElements[rootKeyOfRequiredElements]['$$'] !== undefined) {
                                         parseXmlToSearchable(requiredElements[rootKeyOfRequiredElements]['$$'], rootOfRequiredElementsToAdd['children']);
                                     }
                                     parsedRequiredElements.push(rootOfRequiredElementsToAdd);
@@ -771,8 +741,7 @@ async function writeCordovaAndroidManifest(cordovaPlugins, config, platform, cle
                             }
                         }
                         else {
-                            if (!rootXMLEntries.includes(xmlElement) &&
-                                !contains(rootXMLEntries, xmlElement, k)) {
+                            if (!rootXMLEntries.includes(xmlElement) && !contains(rootXMLEntries, xmlElement, k)) {
                                 rootXMLEntries.push(xmlElement);
                             }
                         }
@@ -782,8 +751,7 @@ async function writeCordovaAndroidManifest(cordovaPlugins, config, platform, cle
         });
     });
     const cleartextString = 'android:usesCleartextTraffic="true"';
-    const cleartextValue = (cleartext || ((_a = config.app.extConfig.server) === null || _a === void 0 ? void 0 : _a.cleartext)) &&
-        !applicationXMLAttributes.includes(cleartextString)
+    const cleartextValue = (cleartext || ((_a = config.app.extConfig.server) === null || _a === void 0 ? void 0 : _a.cleartext)) && !applicationXMLAttributes.includes(cleartextString)
         ? cleartextString
         : '';
     let content = `<?xml version='1.0' encoding='utf-8'?>
@@ -806,7 +774,7 @@ exports.writeCordovaAndroidManifest = writeCordovaAndroidManifest;
 function getPathParts(path) {
     const rootPath = 'manifest';
     path = path.replace('/*', rootPath);
-    const parts = path.split('/').filter(part => part !== '');
+    const parts = path.split('/').filter((part) => part !== '');
     if (parts.length > 1 || parts.includes(rootPath)) {
         return parts;
     }

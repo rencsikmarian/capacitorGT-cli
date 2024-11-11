@@ -1,6 +1,5 @@
 import type { Config } from './definitions';
 import type { SystemConfig } from './sysconfig';
-export declare const THANK_YOU: string;
 export interface CommandMetricData {
     app_id: string;
     command: string;

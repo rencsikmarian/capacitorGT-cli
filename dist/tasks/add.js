@@ -47,11 +47,7 @@ async function addCommand(config, selectedPlatformName) {
                 `${colors_1.default.strong('WARNING')}: Your native project will be completely removed.`);
         }
         try {
-            await (0, common_2.check)([
-                () => (0, common_2.checkPackage)(),
-                () => (0, common_2.checkAppConfig)(config),
-                ...addChecks(config, platformName),
-            ]);
+            await (0, common_2.check)([() => (0, common_2.checkPackage)(), () => (0, common_2.checkAppConfig)(config), ...addChecks(config, platformName)]);
             await doAdd(config, platformName);
             await editPlatforms(config, platformName);
             if (await (0, utils_fs_1.pathExists)(config.app.webDirAbs)) {
@@ -82,10 +78,7 @@ function printNextSteps(platformName) {
 }
 function addChecks(config, platformName) {
     if (platformName === config.ios.name) {
-        return [
-            () => (0, common_3.checkIOSPackage)(config),
-            () => (0, common_3.checkBundler)(config) || (0, common_3.checkCocoaPods)(config),
-        ];
+        return [() => (0, common_3.checkIOSPackage)(config), () => (0, common_3.checkBundler)(config) || (0, common_3.checkCocoaPods)(config)];
     }
     else if (platformName === config.android.name) {
         return [() => (0, common_1.checkAndroidPackage)(config)];

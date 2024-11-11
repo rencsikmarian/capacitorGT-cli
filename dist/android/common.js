@@ -20,9 +20,7 @@ async function resolvePlugin(plugin) {
     var _a;
     const platform = 'android';
     if ((_a = plugin.manifest) === null || _a === void 0 ? void 0 : _a.android) {
-        let pluginFilesPath = plugin.manifest.android.src
-            ? plugin.manifest.android.src
-            : platform;
+        let pluginFilesPath = plugin.manifest.android.src ? plugin.manifest.android.src : platform;
         const absolutePath = (0, path_1.join)(plugin.rootPath, pluginFilesPath, plugin.id);
         // Android folder shouldn't have subfolders, but they used to, so search for them for compatibility reasons
         if (await (0, utils_fs_1.pathExists)(absolutePath)) {
@@ -38,8 +36,7 @@ async function resolvePlugin(plugin) {
             type: 1 /* PluginType.Cordova */,
             path: 'src/' + platform,
         };
-        if ((0, cordova_1.getIncompatibleCordovaPlugins)(platform).includes(plugin.id) ||
-            !(0, plugin_1.getPluginPlatform)(plugin, platform)) {
+        if ((0, cordova_1.getIncompatibleCordovaPlugins)(platform).includes(plugin.id) || !(0, plugin_1.getPluginPlatform)(plugin, platform)) {
             plugin.android.type = 2 /* PluginType.Incompatible */;
         }
     }
