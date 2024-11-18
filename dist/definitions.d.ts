@@ -58,6 +58,12 @@ export interface AppConfig {
     readonly extConfigName: string;
     readonly extConfigFilePath: string;
     readonly extConfig: ExternalConfig;
+    /**
+     * Whether to use a bundled web runtime instead of relying on a bundler/module
+     * loader. If you're not using something like rollup or webpack or dynamic ES
+     * module imports, set this to "true" and import "capacitor.js" manually.
+     */
+    readonly bundledWebRuntime?: boolean;
 }
 export interface AndroidConfig extends PlatformConfig {
     readonly cordovaPluginsDir: string;

@@ -31,7 +31,8 @@ async function resolvePlugin(config, name) {
     try {
         const packagePath = (0, node_1.resolveNode)(config.app.rootDir, name, 'package.json');
         if (!packagePath) {
-            (0, errors_1.fatal)(`Unable to find ${colors_1.default.strong(`node_modules/${name}`)}.\n` + `Are you sure ${colors_1.default.strong(name)} is installed?`);
+            (0, errors_1.fatal)(`Unable to find ${colors_1.default.strong(`node_modules/${name}`)}.\n` +
+                `Are you sure ${colors_1.default.strong(name)} is installed?`);
         }
         const rootPath = (0, path_1.dirname)(packagePath);
         const meta = await (0, utils_fs_1.readJSON)(packagePath);
@@ -78,7 +79,7 @@ function fixName(name) {
         .replace(/\//g, '_')
         .replace(/-/g, '_')
         .replace(/@/g, '')
-        .replace(/_\w/g, (m) => m[1].toUpperCase());
+        .replace(/_\w/g, m => m[1].toUpperCase());
     return name.charAt(0).toUpperCase() + name.slice(1);
 }
 exports.fixName = fixName;
@@ -99,7 +100,7 @@ function printPlugins(plugins, platform, type = 'capacitor') {
             msg = `Found ${plugins.length} Capacitor plugin${plural} for ${colors_1.default.strong(platform)}:\n`;
             break;
     }
-    msg += plugins.map((p) => `${p.id}${colors_1.default.weak(`@${p.version}`)}`).join('\n');
+    msg += plugins.map(p => `${p.id}${colors_1.default.weak(`@${p.version}`)}`).join('\n');
     log_1.logger.info(msg);
 }
 exports.printPlugins = printPlugins;
@@ -154,7 +155,10 @@ function getFilePath(config, plugin, path) {
     if (path.startsWith('node_modules')) {
         let pathSegments = path.split('/').slice(1);
         if (pathSegments[0].startsWith('@')) {
-            pathSegments = [pathSegments[0] + '/' + pathSegments[1], ...pathSegments.slice(2)];
+            pathSegments = [
+                pathSegments[0] + '/' + pathSegments[1],
+                ...pathSegments.slice(2),
+            ];
         }
         const filePath = (0, node_1.resolveNode)(config.app.rootDir, ...pathSegments);
         if (!filePath) {

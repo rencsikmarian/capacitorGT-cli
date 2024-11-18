@@ -9,8 +9,9 @@ async function getPluginFiles(plugins) {
     var _a;
     let filenameList = [];
     const options = {
-        filter: (item) => {
-            if (item.stats.isFile() && (item.path.endsWith('.swift') || item.path.endsWith('.m'))) {
+        filter: item => {
+            if (item.stats.isFile() &&
+                (item.path.endsWith('.swift') || item.path.endsWith('.m'))) {
                 return true;
             }
             else {

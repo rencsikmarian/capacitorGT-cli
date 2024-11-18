@@ -73,7 +73,7 @@ class CapLiveReload {
             return res[0].address;
         }
         const all = Object.keys(interfaces)
-            .map((nic) => {
+            .map(nic => {
             //
             // Note: name will only be `public` or `private`
             // when this is called.
@@ -86,7 +86,9 @@ class CapLiveReload {
                 if (!name) {
                     return true;
                 }
-                return name === 'public' ? isPrivate(details.address) : isPublic(details.address);
+                return name === 'public'
+                    ? isPrivate(details.address)
+                    : isPublic(details.address);
             });
             return addresses.length ? addresses[0].address : undefined;
         })
@@ -136,7 +138,8 @@ class CapLiveReload {
         (0, utils_fs_1.writeJSONSync)(capConfigPath, configJson, { spaces: '\t' });
     }
     async revertCapConfigForLiveReload() {
-        if (this.configJsonToRevertTo.json == null || this.configJsonToRevertTo.platformPath == null)
+        if (this.configJsonToRevertTo.json == null ||
+            this.configJsonToRevertTo.platformPath == null)
             return;
         const capConfigPath = this.configJsonToRevertTo.platformPath;
         const configJson = this.configJsonToRevertTo.json;

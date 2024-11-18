@@ -42,7 +42,8 @@ async function checkBundler(config) {
 }
 exports.checkBundler = checkBundler;
 async function checkCocoaPods(config) {
-    if (!(await (0, subprocess_1.isInstalled)(await config.ios.podPath)) && config.cli.os === "mac" /* OS.Mac */) {
+    if (!(await (0, subprocess_1.isInstalled)(await config.ios.podPath)) &&
+        config.cli.os === "mac" /* OS.Mac */) {
         return (`CocoaPods is not installed.\n` +
             `See this install guide: ${colors_1.default.strong('https://capacitorjs.com/docs/getting-started/environment-setup#homebrew')}`);
     }
@@ -70,7 +71,8 @@ async function resolvePlugin(plugin) {
             type: 1 /* PluginType.Cordova */,
             path: 'src/' + platform,
         };
-        if ((0, cordova_1.getIncompatibleCordovaPlugins)(platform).includes(plugin.id) || !(0, plugin_1.getPluginPlatform)(plugin, platform)) {
+        if ((0, cordova_1.getIncompatibleCordovaPlugins)(platform).includes(plugin.id) ||
+            !(0, plugin_1.getPluginPlatform)(plugin, platform)) {
             plugin.ios.type = 2 /* PluginType.Incompatible */;
         }
     }
@@ -85,7 +87,10 @@ exports.resolvePlugin = resolvePlugin;
  */
 async function editProjectSettingsIOS(config) {
     const appId = config.app.appId;
-    const appName = config.app.appName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const appName = config.app.appName
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
     const pbxPath = `${config.ios.nativeXcodeProjDirAbs}/project.pbxproj`;
     const plistPath = (0, path_1.resolve)(config.ios.nativeTargetDirAbs, 'Info.plist');
     let plistContent = await (0, utils_fs_1.readFile)(plistPath, { encoding: 'utf-8' });

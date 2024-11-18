@@ -12,7 +12,7 @@ const log_1 = require("./log");
 const telemetry_1 = require("./telemetry");
 const cli_1 = require("./util/cli");
 const emoji_1 = require("./util/emoji");
-process.on('unhandledRejection', (error) => {
+process.on('unhandledRejection', error => {
     console.error(colors_1.default.failure('[fatal]'), error);
 });
 process.on('message', ipc_1.receive);
@@ -48,10 +48,9 @@ function runProgram(config) {
         .command('init [appName] [appId]')
         .description(`Initialize Capacitor configuration`)
         .option('--web-dir <value>', 'Optional: Directory of your projects built web assets')
-        .option('--skip-appid-validation', 'Optional: Skip validating the app ID for iOS and Android compatibility')
-        .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (appName, appId, { webDir, skipAppidValidation }) => {
+        .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (appName, appId, { webDir }) => {
         const { initCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/init')));
-        await initCommand(config, appName, appId, webDir, skipAppidValidation);
+        await initCommand(config, appName, appId, webDir);
     })));
     commander_1.program
         .command('serve', { hidden: true })
@@ -66,6 +65,7 @@ function runProgram(config) {
         .option('--deployment', 'Optional: if provided, pod install will use --deployment option')
         .option('--inline', 'Optional: if true, all source maps will be inlined for easier debugging on mobile devices', false)
         .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform, { deployment, inline }) => {
+        (0, config_1.checkExternalConfig)(config.app);
         const { syncCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/sync')));
         await syncCommand(config, platform, deployment, inline);
     })));
@@ -74,6 +74,7 @@ function runProgram(config) {
         .description(`updates the native plugins and dependencies based on ${colors_1.default.strong('package.json')}`)
         .option('--deployment', 'Optional: if provided, pod install will use --deployment option')
         .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform, { deployment }) => {
+        (0, config_1.checkExternalConfig)(config.app);
         const { updateCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/update')));
         await updateCommand(config, platform, deployment);
     })));
@@ -82,6 +83,7 @@ function runProgram(config) {
         .description('copies the web app build into the native app')
         .option('--inline', 'Optional: if true, all source maps will be inlined for easier debugging on mobile devices', false)
         .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform, { inline }) => {
+        (0, config_1.checkExternalConfig)(config.app);
         const { copyCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/copy')));
         await copyCommand(config, platform, inline);
     })));
@@ -95,14 +97,8 @@ function runProgram(config) {
         .option('--keystorealias <keystoreAlias>', 'Key Alias in the keystore')
         .option('--configuration <name>', 'Configuration name of the iOS Scheme')
         .option('--keystorealiaspass <keystoreAliasPass>', 'Password for the Key Alias')
-        .addOption(new commander_1.Option('--androidreleasetype <androidreleasetype>', 'Android release type; APK or AAB').choices([
-        'AAB',
-        'APK',
-    ]))
-        .addOption(new commander_1.Option('--signing-type <signingtype>', 'Program used to sign apps (default: jarsigner)').choices([
-        'apksigner',
-        'jarsigner',
-    ]))
+        .addOption(new commander_1.Option('--androidreleasetype <androidreleasetype>', 'Android release type; APK or AAB').choices(['AAB', 'APK']))
+        .addOption(new commander_1.Option('--signing-type <signingtype>', 'Program used to sign apps (default: jarsigner)').choices(['apksigner', 'jarsigner']))
         .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform, { scheme, flavor, keystorepath, keystorepass, keystorealias, keystorealiaspass, androidreleasetype, signingType, configuration, }) => {
         const { buildCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/build')));
         await buildCommand(config, platform, {
@@ -132,7 +128,7 @@ function runProgram(config) {
         .option('--host <host>', 'Host used for live reload')
         .option('--port <port>', 'Port used for live reload')
         .option('--configuration <name>', 'Configuration name of the iOS Scheme')
-        .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform, { scheme, flavor, list, target, sync, forwardPorts, liveReload, host, port, configuration }) => {
+        .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform, { scheme, flavor, list, target, sync, forwardPorts, liveReload, host, port, configuration, }) => {
         const { runCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/run')));
         await runCommand(config, platform, {
             scheme,
@@ -159,10 +155,12 @@ function runProgram(config) {
         .description('add a native platform project')
         .option('--packagemanager <packageManager>', 'The package manager to use for dependency installs (Cocoapods, SPM **experimental**)')
         .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform, { packagemanager }) => {
+        (0, config_1.checkExternalConfig)(config.app);
         const { addCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/add')));
         const configWritable = config;
         if (packagemanager === 'SPM') {
-            configWritable.cli.assets.ios.platformTemplateArchive = 'ios-spm-template.tar.gz';
+            configWritable.cli.assets.ios.platformTemplateArchive =
+                'ios-spm-template.tar.gz';
             configWritable.cli.assets.ios.platformTemplateArchiveAbs = (0, path_1.resolve)(configWritable.cli.assetsDirAbs, configWritable.cli.assets.ios.platformTemplateArchive);
         }
         await addCommand(configWritable, platform);
@@ -171,6 +169,7 @@ function runProgram(config) {
         .command('ls [platform]')
         .description('list installed Cordova and Capacitor plugins')
         .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform) => {
+        (0, config_1.checkExternalConfig)(config.app);
         const { listCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/list')));
         await listCommand(config, platform);
     })));
@@ -178,6 +177,7 @@ function runProgram(config) {
         .command('doctor [platform]')
         .description('checks the current setup for common errors')
         .action((0, cli_1.wrapAction)((0, telemetry_1.telemetryAction)(config, async (platform) => {
+        (0, config_1.checkExternalConfig)(config.app);
         const { doctorCommand } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/doctor')));
         await doctorCommand(config, platform);
     })));

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.writeConfig = exports.loadConfig = exports.CONFIG_FILE_NAME_JSON = exports.CONFIG_FILE_NAME_JS = exports.CONFIG_FILE_NAME_TS = void 0;
+exports.checkExternalConfig = exports.writeConfig = exports.loadConfig = exports.CONFIG_FILE_NAME_JSON = exports.CONFIG_FILE_NAME_JS = exports.CONFIG_FILE_NAME_TS = void 0;
 const tslib_1 = require("tslib");
 const utils_fs_1 = require("@ionic/utils-fs");
 const debug_1 = tslib_1.__importDefault(require("debug"));
@@ -88,7 +88,9 @@ async function loadExtConfigTS(rootDir, extConfigName, extConfigFilePath) {
         }
         const ts = require(tsPath); // eslint-disable-line @typescript-eslint/no-var-requires
         const extConfigObject = (0, node_1.requireTS)(ts, extConfigFilePath);
-        const extConfig = extConfigObject.default ? await extConfigObject.default : extConfigObject;
+        const extConfig = extConfigObject.default
+            ? await extConfigObject.default
+            : extConfigObject;
         return {
             extConfigType: 'ts',
             extConfigName,
@@ -194,7 +196,7 @@ async function loadAndroidConfig(rootDir, extConfig, cliConfig) {
     };
     return {
         name,
-        minVersion: '23',
+        minVersion: '22',
         studioPath,
         platformDir,
         platformDirAbs,
@@ -237,7 +239,7 @@ async function loadIOSConfig(rootDir, extConfig) {
     const cordovaPluginsDir = 'capacitor-cordova-ios-plugins';
     return {
         name,
-        minVersion: '14.0',
+        minVersion: '13.0',
         platformDir,
         platformDirAbs,
         scheme,
@@ -384,3 +386,13 @@ const config: CapacitorConfig = ${(0, js_1.formatJSObject)(extConfig)};
 
 export default config;\n`;
 }
+function checkExternalConfig(config) {
+    if (typeof config.extConfig.bundledWebRuntime !== 'undefined') {
+        let actionMessage = `Can be safely deleted.`;
+        if (config.extConfig.bundledWebRuntime === true) {
+            actionMessage = `Please, use a bundler to bundle Capacitor and its plugins.`;
+        }
+        log_1.logger.warn(`The ${colors_1.default.strong('bundledWebRuntime')} configuration option has been deprecated. ${actionMessage}`);
+    }
+}
+exports.checkExternalConfig = checkExternalConfig;

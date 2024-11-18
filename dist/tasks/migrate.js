@@ -18,7 +18,12 @@ const subprocess_1 = require("../util/subprocess");
 const template_1 = require("../util/template");
 // eslint-disable-next-line prefer-const
 let allDependencies = {};
-const libs = ['@capacitor/core', '@capacitor/cli', '@capacitor/ios', '@capacitor/android'];
+const libs = [
+    '@capacitor/core',
+    '@capacitor/cli',
+    '@capacitor/ios',
+    '@capacitor/android',
+];
 const plugins = [
     '@capacitor/action-sheet',
     '@capacitor/app',
@@ -79,7 +84,8 @@ async function migrateCommand(config, noprompt, packagemanager) {
             message: `Are you sure you want to migrate? (Y/n)`,
             initial: 'y',
         });
-    if (typeof migrateconfirm === 'string' && migrateconfirm.toLowerCase() === 'y') {
+    if (typeof migrateconfirm === 'string' &&
+        migrateconfirm.toLowerCase() === 'y') {
         try {
             const { depInstallConfirm } = noprompt
                 ? { depInstallConfirm: 'y' }
@@ -89,7 +95,8 @@ async function migrateCommand(config, noprompt, packagemanager) {
                     message: `Run Dependency Install? (Y/n)`,
                     initial: 'y',
                 });
-            const runNpmInstall = typeof depInstallConfirm === 'string' && depInstallConfirm.toLowerCase() === 'y';
+            const runNpmInstall = typeof depInstallConfirm === 'string' &&
+                depInstallConfirm.toLowerCase() === 'y';
             let installerType = 'npm';
             if (runNpmInstall) {
                 const { manager } = packagemanager
@@ -118,7 +125,8 @@ async function migrateCommand(config, noprompt, packagemanager) {
                 installFailed = true;
             }
             // Update iOS Projects
-            if (allDependencies['@capacitor/ios'] && (0, utils_fs_1.existsSync)(config.ios.platformDirAbs)) {
+            if (allDependencies['@capacitor/ios'] &&
+                (0, utils_fs_1.existsSync)(config.ios.platformDirAbs)) {
                 // ios template changes
                 // Remove NSLocationAlwaysUsageDescription
                 await (0, common_2.runTask)(`Migrating Info.plist by removing NSLocationAlwaysUsageDescription key.`, () => {
@@ -133,7 +141,8 @@ async function migrateCommand(config, noprompt, packagemanager) {
             else {
                 log_1.logger.warn('Skipped Running cap sync.');
             }
-            if (allDependencies['@capacitor/android'] && (0, utils_fs_1.existsSync)(config.android.platformDirAbs)) {
+            if (allDependencies['@capacitor/android'] &&
+                (0, utils_fs_1.existsSync)(config.android.platformDirAbs)) {
                 const gradleWrapperVersion = getGradleWrapperVersion((0, path_1.join)(config.android.platformDirAbs, 'gradle', 'wrapper', 'gradle-wrapper.properties'));
                 if (!installFailed && (0, semver_1.gt)(gradleVersion, gradleWrapperVersion)) {
                     try {
@@ -192,9 +201,11 @@ async function migrateCommand(config, noprompt, packagemanager) {
                             if (txt.includes(replaceStart)) {
                                 const first = txt.indexOf(replaceStart) + replaceStart.length;
                                 const value = txt.substring(first, txt.indexOf(replaceEnd, first));
-                                if ((typeof variablesAndClasspaths.variables[variable] === 'number' &&
+                                if ((typeof variablesAndClasspaths.variables[variable] ===
+                                    'number' &&
                                     value <= variablesAndClasspaths.variables[variable]) ||
-                                    (typeof variablesAndClasspaths.variables[variable] === 'string' &&
+                                    (typeof variablesAndClasspaths.variables[variable] ===
+                                        'string' &&
                                         (0, semver_1.lt)(value, variablesAndClasspaths.variables[variable]))) {
                                     await updateFile(config, variablesPath, replaceStart, replaceEnd, variablesAndClasspaths.variables[variable].toString(), true);
                                 }
@@ -332,8 +343,10 @@ async function getAndroidVariablesAndClasspaths(config) {
     (0, fs_1.deleteFolderRecursive)(tempAndroidTemplateFolder);
     const firstIndxOfCATBGV = buildGradleFile.indexOf(`classpath 'com.android.tools.build:gradle:`) + 42;
     const firstIndxOfCGGGS = buildGradleFile.indexOf(`com.google.gms:google-services:`) + 31;
-    const comAndroidToolsBuildGradleVersion = '' + buildGradleFile.substring(firstIndxOfCATBGV, buildGradleFile.indexOf("'", firstIndxOfCATBGV));
-    const comGoogleGmsGoogleServices = '' + buildGradleFile.substring(firstIndxOfCGGGS, buildGradleFile.indexOf("'", firstIndxOfCGGGS));
+    const comAndroidToolsBuildGradleVersion = '' +
+        buildGradleFile.substring(firstIndxOfCATBGV, buildGradleFile.indexOf("'", firstIndxOfCATBGV));
+    const comGoogleGmsGoogleServices = '' +
+        buildGradleFile.substring(firstIndxOfCGGGS, buildGradleFile.indexOf("'", firstIndxOfCGGGS));
     const variablesGradleAsJSON = JSON.parse(variablesGradleFile
         .replace('ext ', '')
         .replace(/=/g, ':')
@@ -346,7 +359,7 @@ async function getAndroidVariablesAndClasspaths(config) {
         .replace(/\s/g, '')
         .replace(/'/g, '"'));
     return {
-        variables: variablesGradleAsJSON,
+        'variables': variablesGradleAsJSON,
         'com.android.tools.build:gradle': comAndroidToolsBuildGradleVersion,
         'com.google.gms:google-services': comGoogleGmsGoogleServices,
     };
@@ -374,7 +387,15 @@ function getGradleWrapperVersion(filename) {
     return semverVersion ? semverVersion : '0.0.0';
 }
 async function updateGradleWrapperFiles(platformDir) {
-    await (0, subprocess_1.runCommand)(`./gradlew`, ['wrapper', '--distribution-type', 'all', '--gradle-version', gradleVersion, '--warning-mode', 'all'], {
+    await (0, subprocess_1.runCommand)(`./gradlew`, [
+        'wrapper',
+        '--distribution-type',
+        'all',
+        '--gradle-version',
+        gradleVersion,
+        '--warning-mode',
+        'all',
+    ], {
         cwd: platformDir,
     });
 }
@@ -497,7 +518,10 @@ function setAllStringIn(data, start, end, replacement) {
         else {
             const idx = foundIdx + start.length;
             position = idx + replacement.length;
-            result = result.substring(0, idx) + replacement + result.substring(result.indexOf(end, idx));
+            result =
+                result.substring(0, idx) +
+                    replacement +
+                    result.substring(result.indexOf(end, idx));
         }
     }
     return result;
@@ -534,7 +558,7 @@ async function removeKey(filename, key) {
     let lines = txt.split('\n');
     let removed = false;
     let removing = false;
-    lines = lines.filter((line) => {
+    lines = lines.filter(line => {
         if (removing && line.includes('</string>')) {
             removing = false;
             return false;
